@@ -1,5 +1,5 @@
 export async function askAI(messages, systemPrompt = '') {
-  const response = await fetch('http://https://coolai-server.onrender.com/api/chat', {
+  const response = await fetch('https://coolai-server.onrender.com/api/chat', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

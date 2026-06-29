@@ -15,7 +15,7 @@ export function AuthProvider({ children }) {
     setUser(userData)
 
     // Record visit and get usage
-    const res = await fetch('http://https://coolai-server.onrender.com/api/usage/visit', {
+    const res = await fetch('https://coolai-server.onrender.com/api/usage/visit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: userData.email })
@@ -26,7 +26,7 @@ export function AuthProvider({ children }) {
   }
 
   const checkUsage = async (email) => {
-    const res = await fetch(`http://https://coolai-server.onrender.com/api/usage/${email}`)
+    const res = await fetch(`https://coolai-server.onrender.com/api/usage/${email}`)
     const data = await res.json()
     setUsage(data)
     return data
