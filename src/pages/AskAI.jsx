@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { askAI } from '../api/gemini'
 import bgImage from '../assets/background.png'
+import ReactMarkdown from 'react-markdown'
 
 export default function AskAI() {
   const [messages, setMessages] = useState([])
@@ -121,12 +122,26 @@ export default function AskAI() {
           {messages.map((msg, i) => (
             <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               <div className={`max-w-[78%] px-4 py-3 rounded-2xl text-sm leading-relaxed font-medium shadow-lg ${
-                msg.role === 'user'
-                  ? 'bg-cool-500 text-white rounded-br-md'
-                  : 'bg-white text-ink rounded-bl-md'
-              }`}>
-                {msg.content}
-              </div>
+  msg.role === 'user'
+    ? 'bg-cool-500 text-white rounded-br-md'
+    : 'bg-white text-ink rounded-bl-md'
+}`}>
+  {msg.role === 'user' ? (
+    msg.content
+  ) : (
+    <ReactMarkdown
+      components={{
+        p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+        ul: ({ children }) => <ul className="list-disc pl-4 mb-2 space-y-1">{children}</ul>,
+        ol: ({ children }) => <ol className="list-decimal pl-4 mb-2 space-y-1">{children}</ol>,
+        li: ({ children }) => <li>{children}</li>,
+        strong: ({ children }) => <strong className="font-bold">{children}</strong>,
+      }}
+    >
+      {msg.content}
+    </ReactMarkdown>
+  )}
+</div>
             </div>
           ))}
 
