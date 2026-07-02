@@ -9,18 +9,23 @@ export default function Register() {
   const [error, setError] = useState('')
   const navigate = useNavigate()
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    const users = JSON.parse(localStorage.getItem('coolai_users') || '[]')
-    const exists = users.find(u => u.email === email)
-    if (exists) {
-      setError('Email already registered')
-      return
+    try {
+      const res = await fetch('https://coolai-server.onrender.com/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password })
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(data.error || 'Registration failed')
+        return
+      }
+      navigate('/login')
+    } catch (err) {
+      setError('Something went wrong. Please try again.')
     }
-    const newUser = { name, email, password }
-    users.push(newUser)
-    localStorage.setItem('coolai_users', JSON.stringify(users))
-    navigate('/login')
   }
 
   return (

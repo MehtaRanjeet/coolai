@@ -11,16 +11,24 @@ export default function Login() {
   const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
-  e.preventDefault()
-  const users = JSON.parse(localStorage.getItem('coolai_users') || '[]')
-  const user = users.find(u => u.email === email && u.password === password)
-  if (user) {
-    const usageData = await login(user)
-    navigate('/')
-  } else {
-    setError('Invalid email or password')
+    e.preventDefault()
+    try {
+      const res = await fetch('https://coolai-server.onrender.com/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(data.error || 'Invalid email or password')
+        return
+      }
+      await login(data.user)
+      navigate('/')
+    } catch (err) {
+      setError('Something went wrong. Please try again.')
+    }
   }
-}
 
   return (
     <div className="min-h-screen flex items-center justify-center px-6 relative overflow-hidden">
