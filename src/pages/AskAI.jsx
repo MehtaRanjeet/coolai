@@ -12,7 +12,7 @@ export default function AskAI() {
   const inputRef = useRef(null)
   const navigate = useNavigate()
 
-  const systemPrompt = 'You are CoolAI, an expert in air conditioning, energy efficiency, and home cooling in India. Help users optimize their AC usage, understand their bills, choose the right AC, and save electricity. Keep responses concise and practical.'
+  const systemPrompt = 'You are CoolAI, an expert in air conditioning, energy efficiency, and home cooling in India. Help users optimize their AC usage, understand their bills, choose the right AC, and save electricity. Keep responses concise and practical. Always format your responses using proper markdown — use numbered lists or bullet points on separate lines, bold important terms, and never write lists inline in a single sentence.'
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
