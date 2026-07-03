@@ -1,38 +1,59 @@
-import { useState, useEffect } from 'react'
+ import { useState } from 'react'
 
-const ADMIN_TOKEN = 'CoolAI_user@1234'
 const API = 'https://coolai-server.onrender.com'
 
 export default function AdminPanel() {
-  const [authed, setAuthed] = useState(false)
+  const [token, setToken] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [loginError, setLoginError] = useState('')
+  const [loggingIn, setLoggingIn] = useState(false)
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(false)
   const [search, setSearch] = useState('')
   const [actionLoading, setActionLoading] = useState('')
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault()
-    if (username === 'CoolAI_user' && password === 'CoolAI_user@1234') {
-      setAuthed(true)
-      fetchUsers()
-    } else {
-      setLoginError('Invalid credentials')
+    setLoginError('')
+    setLoggingIn(true)
+    try {
+      const res = await fetch(`${API}/api/admin/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      })
+      const data = await res.json()
+      if (!res.ok || !data.token) {
+        setLoginError(data.error || 'Invalid credentials')
+      } else {
+        setToken(data.token)
+        await fetchUsers(data.token)
+      }
+    } catch {
+      setLoginError('Could not reach server')
     }
+    setLoggingIn(false)
   }
 
-  const fetchUsers = async () => {
+  const fetchUsers = async (authToken = token) => {
     setLoading(true)
     try {
       const res = await fetch(`${API}/api/admin/users`, {
-        headers: { 'x-admin-token': ADMIN_TOKEN }
+        headers: { Authorization: `Bearer ${authToken}` }
       })
       const data = await res.json()
-      setUsers(data)
+      if (!res.ok) {
+        // token expired/invalid — bounce back to login
+        setToken(null)
+        setLoginError(data.error || 'Session expired, please sign in again')
+        setUsers([])
+      } else {
+        setUsers(Array.isArray(data) ? data : [])
+      }
     } catch {
       alert('Failed to fetch users')
+      setUsers([])
     }
     setLoading(false)
   }
@@ -44,7 +65,7 @@ export default function AdminPanel() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-admin-token': ADMIN_TOKEN
+          Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({ email })
       })
@@ -62,7 +83,7 @@ export default function AdminPanel() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-admin-token': ADMIN_TOKEN
+          Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({ email })
       })
@@ -73,7 +94,7 @@ export default function AdminPanel() {
     setActionLoading('')
   }
 
-  const filtered = users.filter(u =>
+  const filtered = (users || []).filter(u =>
     u.name?.toLowerCase().includes(search.toLowerCase()) ||
     u.email?.toLowerCase().includes(search.toLowerCase())
   )
@@ -84,7 +105,7 @@ export default function AdminPanel() {
     return { label: 'Free', color: 'bg-gray-100 text-gray-600' }
   }
 
-  if (!authed) {
+  if (!token) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-950 px-6">
         <div className="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-10">
@@ -109,7 +130,7 @@ export default function AdminPanel() {
                 type="text"
                 value={username}
                 onChange={e => setUsername(e.target.value)}
-                placeholder="CoolAI_user"
+                placeholder="Username"
                 className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
                 required
               />
@@ -127,9 +148,10 @@ export default function AdminPanel() {
             </div>
             <button
               type="submit"
-              className="w-full bg-gray-900 text-white py-3.5 rounded-xl font-bold hover:bg-blue-600 transition-all"
+              disabled={loggingIn}
+              className="w-full bg-gray-900 text-white py-3.5 rounded-xl font-bold hover:bg-blue-600 transition-all disabled:opacity-50"
             >
-              Sign In
+              {loggingIn ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
         </div>
@@ -166,7 +188,7 @@ export default function AdminPanel() {
               </div>
             </div>
             <button
-              onClick={() => setAuthed(false)}
+              onClick={() => { setToken(null); setUsers([]) }}
               className="bg-gray-800 hover:bg-gray-700 text-gray-300 px-4 py-2 rounded-xl text-sm transition-all"
             >
               Logout
@@ -184,7 +206,7 @@ export default function AdminPanel() {
             className="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <button
-            onClick={fetchUsers}
+            onClick={() => fetchUsers()}
             className="bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 px-5 py-3 rounded-xl text-sm transition-all"
           >
             🔄 Refresh
