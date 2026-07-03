@@ -15,6 +15,7 @@ import Profile from './pages/Profile'
 import Navbar from './components/Navbar'
 import Layout from './components/Layout'
 import Paywall from './components/Paywall'
+import AdminPanel from './pages/AdminPanel'
 
 function ProtectedRoute({ children }) {
   const { user } = useAuth()
@@ -54,6 +55,7 @@ export default function App() {
         <Route path="/ask-ai" element={<ProtectedRoute><AskAI /></ProtectedRoute>} />
         <Route path="/technician" element={<AppPage><Technician /></AppPage>} />
         <Route path="/profile" element={<AppPage><Profile /></AppPage>} />
+        <Route path="/admin" element={<AdminPanel />} />
       </Routes>
     </BrowserRouter>
   )
