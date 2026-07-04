@@ -12,7 +12,7 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      const res = await fetch('https://coolai-server.onrender.com/api/register', {
+      const res = await fetch('https://coolai-server-1022108053911.asia-south1.run.app/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password })

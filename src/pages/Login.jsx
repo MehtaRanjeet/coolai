@@ -13,7 +13,7 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      const res = await fetch('https://coolai-server.onrender.com/api/login', {
+      const res = await fetch('https://coolai-server-1022108053911.asia-south1.run.app/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
@@ -23,7 +23,7 @@ export default function Login() {
         setError(data.error || 'Invalid email or password')
         return
       }
-      await login(data.user)
+      await login(data.user, data.token)
       navigate('/')
     } catch (err) {
       setError('Something went wrong. Please try again.')

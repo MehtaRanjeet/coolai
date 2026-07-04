@@ -1,6 +1,6 @@
  import { useState } from 'react'
 
-const API = 'https://coolai-server.onrender.com'
+const API = 'https://coolai-server-1022108053911.asia-south1.run.app'
 
 export default function AdminPanel() {
   const [token, setToken] = useState(null)
